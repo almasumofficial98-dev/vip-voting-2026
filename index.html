@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIP Student Council Elections 2026-27</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.avif">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <!-- Lottie Files Web Component -->
+    <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.14/dist/dotlottie-wc.js" type="module"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Success Animation Modal (Hidden by default) -->
+    <div id="success-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="background: transparent; border: none; box-shadow: none;">
+            <dotlottie-wc src="https://lottie.host/4bb5d76f-478b-4c9a-a4b1-9fc8c90cf7be/cL6WbQoNQH.lottie"
+                style="width: 300px; height: 300px; margin: 0 auto;" autoplay loop></dotlottie-wc>
+            <h2
+                style="font-family: var(--font-display); color: #10b981; margin-top: 1.5rem; font-size: 2.2rem; text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);">
+                Vote Recorded!</h2>
+        </div>
+    </div>
+
+    <!-- Confirm Vote Modal (Hidden by default) -->
+    <div id="confirm-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 480px; padding: 2.5rem 2rem; box-shadow: var(--shadow-lg);">
+            <h2 style="font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; margin-bottom: 1.25rem; color: var(--text-primary);">Confirm Your Vote</h2>
+            <p style="color: var(--text-secondary); font-size: 1.05rem; line-height: 1.6; margin-bottom: 2rem;">
+                Are you sure you want to cast your vote for <strong id="confirm-candidate-name" style="color: var(--accent-primary); font-weight: 700;">[Candidate Name]</strong> for the role of <strong id="confirm-position-name" style="color: var(--text-primary); font-weight: 700;">[Position]</strong>?
+            </p>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button id="confirm-cancel-btn" class="nav-btn" style="border: 1px solid var(--border-color); width: 120px; font-weight: 600; border-radius: 12px; padding: 0.75rem;">Cancel</button>
+                <button id="confirm-ok-btn" class="vote-btn" style="margin-top: 0; width: 160px; border-radius: 12px; padding: 0.75rem;">Confirm Vote</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app">
+        <header class="navbar">
+            <div class="logo">
+                <img src="logo.png" alt="VIP's International School Logo" class="logo-img" onclick="window.renderHomeView()" style="height: 90px; margin: -20px 0; cursor: pointer; transition: transform 0.2s ease;">
+            </div>
+            <nav style="display: flex; gap: 1.5rem; align-items: center;">
+                <button id="nav-dashboard" class="nav-btn active">Dashboard</button>
+                <button id="nav-vote" class="nav-btn">Vote</button>
+            </nav>
+        </header>
+
+        <!-- Main Content Area -->
+        <main id="main-content">
+            <!-- Dynamic Content Injected Here -->
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <p>&copy; 2026 VIP Student Council Elections. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
