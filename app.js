@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const voteBtn = document.getElementById('nav-vote');
 
     let allData = [];
-    let currentView = 'dashboard'; // 'dashboard', 'vote', 'position'
+    let currentView = 'vote'; // 'dashboard', 'vote', 'position'
     let activePosition = null;
     let unsubscribeCandidates = null;
 
