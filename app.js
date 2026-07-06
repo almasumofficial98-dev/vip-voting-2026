@@ -14,11 +14,31 @@ document.addEventListener('DOMContentLoaded', () => {
     let unsubscribeCandidates = null;
 
     const STAFF_ROLES = [
-        { name: "Leadership", weight: 20, icon: "👑" },
-        { name: "Incharges", weight: 10, icon: "📝" },
-        { name: "Teachers", weight: 5, icon: "🏫" },
-        { name: "Supervisors", weight: 3, icon: "🔍" },
-        { name: "Helping Staff", weight: 3, icon: "🤝" }
+        { 
+            name: "Leadership", 
+            weight: 20, 
+            icon: `<svg class="role-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>` 
+        },
+        { 
+            name: "Incharges", 
+            weight: 10, 
+            icon: `<svg class="role-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>` 
+        },
+        { 
+            name: "Teachers", 
+            weight: 5, 
+            icon: `<svg class="role-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>` 
+        },
+        { 
+            name: "Supervisors", 
+            weight: 3, 
+            icon: `<svg class="role-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>` 
+        },
+        { 
+            name: "Helping Staff", 
+            weight: 3, 
+            icon: `<svg class="role-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>` 
+        }
     ];
 
     // --- Core Application ---
@@ -182,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
         STAFF_ROLES.forEach((role, idx) => {
             html += `
                 <div class="position-card" onclick="window.selectStaffRole(${idx})" style="padding: 2.5rem 1.5rem;">
-                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">${role.icon}</div>
+                    <div style="margin-bottom: 1rem; display: flex; justify-content: center; align-items: center;">${role.icon}</div>
                     <h3 class="position-title" style="margin-bottom: 0.5rem;">${role.name}</h3>
                     <span style="font-size: 0.85rem; font-weight: 700; color: var(--accent-primary); background: rgba(168, 35, 41, 0.08); padding: 0.25rem 0.75rem; border-radius: 99px;">
                         Weight: ${role.weight}x
@@ -218,15 +238,21 @@ document.addEventListener('DOMContentLoaded', () => {
         staffVoteBtn.classList.add('active');
 
         let html = `
-            <div class="dashboard-header-card" style="padding: 1.5rem 2rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                <div style="text-align: left;">
-                    <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Staff Mode Enabled</span>
-                    <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; color: var(--accent-primary); margin: 0.25rem 0 0 0;">
-                        ${activeStaffRole.icon} ${activeStaffRole.name} (${activeStaffRole.weight} votes per selection)
-                    </h2>
+            <div class="dashboard-header-card staff-banner" style="padding: 1.5rem 2rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div style="text-align: left; display: flex; align-items: center; gap: 0.75rem;">
+                    <div style="background: rgba(168, 35, 41, 0.08); border-radius: 12px; padding: 0.5rem; display: flex; align-items: center;">
+                        ${activeStaffRole.icon}
+                    </div>
+                    <div>
+                        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Staff Mode Enabled</span>
+                        <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; color: var(--accent-primary); margin: 0.15rem 0 0 0;">
+                            ${activeStaffRole.name} (${activeStaffRole.weight} votes per selection)
+                        </h2>
+                    </div>
                 </div>
-                <button class="nav-btn" onclick="window.changeStaffRole()" style="border: 1px solid var(--border-color); background: white;">
-                    🔄 Change Role
+                <button class="nav-btn" onclick="window.changeStaffRole()" style="border: 1px solid var(--border-color); background: white; display: flex; align-items: center; gap: 0.25rem;">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18.2" /></svg>
+                    Change Role
                 </button>
             </div>
 
@@ -271,8 +297,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (isStaff && activeStaffRole) {
             html += `
-                <div style="background: rgba(168, 35, 41, 0.03); border: 1px solid rgba(168, 35, 41, 0.1); padding: 0.75rem 1.25rem; border-radius: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; float: right; font-size: 0.9rem; color: var(--accent-primary);">
-                    <span>${activeStaffRole.icon} Voting as <strong>${activeStaffRole.name}</strong> (${activeStaffRole.weight}x multiplier)</span>
+                <div class="staff-banner-badge" style="background: rgba(168, 35, 41, 0.03); border: 1px solid rgba(168, 35, 41, 0.1); padding: 0.75rem 1.25rem; border-radius: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; float: right; font-size: 0.9rem; color: var(--accent-primary);">
+                    ${activeStaffRole.icon}
+                    <span>Voting as <strong>${activeStaffRole.name}</strong> (${activeStaffRole.weight}x multiplier)</span>
                 </div>
             `;
         }

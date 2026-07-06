@@ -538,6 +538,25 @@ footer {
     border-color: rgba(220, 38, 38, 0.2) !important;
 }
 
+/* Staff Role Icons */
+.role-icon {
+    width: 48px;
+    height: 48px;
+    color: var(--accent-primary);
+    stroke-width: 1.5;
+}
+
+.staff-banner .role-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.staff-banner-badge .role-icon {
+    width: 18px;
+    height: 18px;
+}
+
+
 
 
 
