@@ -7,7 +7,7 @@ const CONFIG = {
     // 4. Click Publish and copy the link.
     // 5. Paste the link below, replacing the empty string.
     GOOGLE_SHEETS_CSV_URL: "",
-    
+
     // Position ordering
     POSITIONS_ORDER: [
         "Head Boy",

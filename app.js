@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let isActivePositionStaff = false;
     let activeStaffRole = null; // { name: "Teachers", weight: 5 }
     let pendingAdminView = null;
+    let previousData = [];
+    let recentVoteLogs = [];
+    let inspectedPosition = null;
     let unsubscribeCandidates = null;
 
     const STAFF_ROLES = [
@@ -59,6 +62,28 @@ document.addEventListener('DOMContentLoaded', () => {
         // Subscribe to student candidates updates
         if (unsubscribeCandidates) unsubscribeCandidates();
         unsubscribeCandidates = subscribeToCandidates((data) => {
+            // Track live updates and log them
+            if (previousData.length > 0) {
+                data.forEach(candidate => {
+                    const prev = previousData.find(c => c.id === candidate.id);
+                    if (prev && (candidate.voteCount || 0) > (prev.voteCount || 0)) {
+                        const diff = (candidate.voteCount || 0) - (prev.voteCount || 0);
+                        const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                        recentVoteLogs.unshift({
+                            text: `Added +${diff} pts for ${candidate.Name} (${candidate.Position})`,
+                            time: timestamp
+                        });
+                        if (recentVoteLogs.length > 6) recentVoteLogs.pop(); // keep last 6 logs
+                    }
+                });
+            } else {
+                const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                recentVoteLogs = [
+                    { text: "Election system loaded. Listening for live updates...", time: timestamp }
+                ];
+            }
+            previousData = JSON.parse(JSON.stringify(data)); // deep clone
+            
             allData = data;
             triggerRender();
         });
@@ -90,15 +115,147 @@ document.addEventListener('DOMContentLoaded', () => {
         // Calculate total vote points cast across all candidates
         const totalVotes = allData.reduce((sum, candidate) => sum + (candidate.voteCount || 0), 0);
 
-        let html = `
-            <div class="dashboard-header-card">
-                <h1>Live Election Dashboard</h1>
-                <div class="stats-counter">
-                    <span class="stats-num">${totalVotes}</span>
-                    <span class="stats-label">Total Vote Points Cast</span>
+        // Ensure we have a default inspected position
+        if (!inspectedPosition && CONFIG.POSITIONS_ORDER.length > 0) {
+            inspectedPosition = CONFIG.POSITIONS_ORDER[0];
+        }
+
+        // Left Column: Inspected Position Race Details
+        let candRowsHTML = "";
+        let statusHTML = "";
+        const positions = CONFIG.POSITIONS_ORDER;
+
+        if (inspectedPosition) {
+            const normalizedPos = inspectedPosition.trim().toLowerCase();
+            const candList = allData
+                .filter(c => c.Position && c.Position.trim().toLowerCase() === normalizedPos)
+                .sort((a, b) => (b.voteCount || 0) - (a.voteCount || 0));
+
+            const totalPosVotes = candList.reduce((sum, c) => sum + (c.voteCount || 0), 0);
+
+            // Compute smart race status banner for the inspected position
+            if (candList.length > 0) {
+                const topVotes = candList[0].voteCount || 0;
+                const runnerVotes = candList[1] ? (candList[1].voteCount || 0) : 0;
+                const diff = topVotes - runnerVotes;
+                
+                if (topVotes === 0) {
+                    statusHTML = `
+                        <div class="status-pill no-votes">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                            No votes yet
+                        </div>
+                    `;
+                } else if (diff === 0 && candList.length > 1) {
+                    statusHTML = `
+                        <div class="status-pill close-race" style="background: #fffbeb; color: #d97706; border-color: #fde68a;">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                            Tie! (${topVotes} pts each)
+                        </div>
+                    `;
+                } else if (diff <= 2 && candList.length > 1) {
+                    statusHTML = `
+                        <div class="status-pill close-race">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                            Close Race! (Diff: ${diff} pts)
+                        </div>
+                    `;
+                } else {
+                    statusHTML = `
+                        <div class="status-pill clear-leader">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
+                            Clear Leader (Diff: ${diff} pts)
+                        </div>
+                    `;
+                }
+            }
+
+            candList.forEach((cand, idx) => {
+                const percentage = totalPosVotes > 0 ? Math.round((cand.voteCount / totalPosVotes) * 100) : 0;
+                const initials = cand.Name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                
+                let rankBadge = "";
+                let fillBg = "var(--accent-secondary)";
+                
+                if (cand.voteCount > 0) {
+                    const isTopVotes = cand.voteCount === candList[0].voteCount;
+                    const isRunnerVotes = candList[1] && cand.voteCount === candList[1].voteCount && !isTopVotes;
+                    const isTied = candList[1] && candList[0].voteCount === candList[1].voteCount;
+
+                    if (isTopVotes) {
+                        rankBadge = `<span class="rank-badge rank-1">${isTied ? '🤝 Tied' : '🏆 Leader'}</span>`;
+                        fillBg = "var(--accent-primary)";
+                    } else if (isRunnerVotes) {
+                        rankBadge = `<span class="rank-badge rank-2">🥈 Runner-up</span>`;
+                    }
+                }
+
+                candRowsHTML += `
+                    <div class="inspector-cand-row">
+                        <div class="inspector-cand-header">
+                            <div class="inspector-cand-profile">
+                                <div class="inspector-cand-avatar">${initials}</div>
+                                <div>
+                                    <div class="inspector-cand-name">${cand.Name}</div>
+                                    <div class="inspector-cand-grade">Grade: ${cand.Grade} &nbsp;${rankBadge}</div>
+                                </div>
+                            </div>
+                            <div class="inspector-cand-votes">${cand.voteCount || 0} pts (${percentage}%)</div>
+                        </div>
+                        <div class="inspector-progress-bg">
+                            <div class="inspector-progress-fill" style="width: ${percentage}%; background: ${fillBg};"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (candList.length === 0) {
+                candRowsHTML = `<p style="color: var(--text-secondary); text-align: center; font-size: 0.9rem; padding: 1.5rem 0;">No candidates for this position.</p>`;
+            }
+        }
+
+        // Right Column: Interactive Grid
+        let gridHTML = "";
+        positions.forEach(pos => {
+            const posCandidates = allData
+                .filter(c => c.Position && c.Position.trim().toLowerCase() === pos.trim().toLowerCase())
+                .sort((a, b) => (b.voteCount || 0) - (a.voteCount || 0));
+
+            const leader = posCandidates[0];
+            const isTied = posCandidates[1] && posCandidates[0].voteCount === posCandidates[1].voteCount && posCandidates[0].voteCount > 0;
+            const leaderName = leader && leader.voteCount > 0 ? (isTied ? "Tied" : leader.Name.split(' ')[0]) : "No votes";
+            const leaderPts = leader ? (leader.voteCount || 0) : 0;
+            const isActive = pos === inspectedPosition ? "active" : "";
+
+            gridHTML += `
+                <div class="compact-pos-card ${isActive}" onclick="window.selectInspectedPosition('${pos.replace(/'/g, "\\'")}')">
+                    <h4 class="compact-pos-title">${pos}</h4>
+                    <div class="compact-pos-leader">
+                        <span>Leader: <strong>${leaderName}</strong></span>
+                        <span class="compact-pos-pts">${leaderPts} pts</span>
+                    </div>
                 </div>
-                <div style="margin-top: 1.5rem;">
-                    <button class="reset-db-btn" onclick="window.handleResetDatabase()">
+            `;
+        });
+
+        let html = `
+            <div class="dashboard-header-card" style="margin-bottom: 1.5rem; padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div style="text-align: left;">
+                    <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">VIP Council Elections 2026</span>
+                    <h1 style="font-family: var(--font-display); font-size: 2.2rem; font-weight: 800; color: var(--accent-primary); margin: 0.25rem 0 0 0; background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Live Election Dashboard</h1>
+                </div>
+                <div style="display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;">
+                    <div style="text-align: right; display: flex; gap: 1.5rem; align-items: center;">
+                        <div style="text-align: right;">
+                            <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; display: block;">Total Vote Points</span>
+                            <strong style="font-size: 1.8rem; font-weight: 800; color: var(--text-primary); line-height: 1.1;">${totalVotes}</strong>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; display: block;">Active Races</span>
+                            <strong style="font-size: 1.8rem; font-weight: 800; color: var(--text-primary); line-height: 1.1;">${positions.length}</strong>
+                        </div>
+                    </div>
+                    <button class="reset-db-btn" onclick="window.handleResetDatabase()" style="margin-top: 0; padding: 0.6rem 1.5rem;">
                         <svg style="vertical-align: middle; margin-right: 0.5rem;" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
@@ -106,59 +263,40 @@ document.addEventListener('DOMContentLoaded', () => {
                     </button>
                 </div>
             </div>
-            
-            <h2 class="section-title" style="margin-top: 2rem;">Real-time Position Leaders</h2>
-            <div class="dashboard-grid">
-        `;
 
-        const positions = CONFIG.POSITIONS_ORDER;
-
-        positions.forEach(pos => {
-            const posCandidates = allData
-                .filter(c => c.Position && c.Position.trim().toLowerCase() === pos.trim().toLowerCase())
-                .sort((a, b) => (b.voteCount || 0) - (a.voteCount || 0));
-
-            const totalPosVotes = posCandidates.reduce((sum, c) => sum + (c.voteCount || 0), 0);
-
-            html += `
-                <div class="dash-pos-card">
-                    <div class="dash-pos-header">
-                        <h3>${pos}</h3>
-                        <span class="total-pos-votes">${totalPosVotes} pts</span>
-                    </div>
-                    <div class="dash-candidates-list">
-            `;
-
-            if (posCandidates.length === 0) {
-                html += `<p style="color: var(--text-secondary); font-size: 0.9rem;">No candidates yet.</p>`;
-            } else {
-                posCandidates.forEach((candidate, index) => {
-                    const percentage = totalPosVotes > 0 ? Math.round((candidate.voteCount / totalPosVotes) * 100) : 0;
-                    const isLeader = index === 0 && candidate.voteCount > 0;
-                    
-                    html += `
-                        <div class="dash-candidate-row">
-                            <div class="dash-cand-info">
-                                <span class="cand-name-rank">${isLeader ? '👑 ' : ''}${candidate.Name} (${candidate.Grade})</span>
-                                <span class="cand-vote-val">${candidate.voteCount || 0} (${percentage}%)</span>
-                            </div>
-                            <div class="progress-bar-bg">
-                                <div class="progress-bar-fill" style="width: ${percentage}%; background: ${isLeader ? 'var(--accent-primary)' : 'var(--accent-secondary)'};"></div>
-                            </div>
+            <!-- Two Column Interactive Layout -->
+            <div class="dashboard-two-col">
+                <!-- Left Column: Inspector Focus Card -->
+                <div class="hero-detail-card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem; width: 100%;">
+                        <div style="text-align: left;">
+                            <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Currently Inspecting</span>
+                            <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; color: var(--accent-primary); margin: 0.15rem 0 0 0;">${inspectedPosition}</h2>
                         </div>
-                    `;
-                });
-            }
-
-            html += `
+                        ${statusHTML}
+                    </div>
+                    <div style="border-bottom: 1px solid var(--border-color); width: 100%;"></div>
+                    <div class="inspector-candidates-list">
+                        ${candRowsHTML}
                     </div>
                 </div>
-            `;
-        });
 
-        html += `</div>`;
+                <!-- Right Column: Interactive Grid -->
+                <div>
+                    <h2 class="section-title" style="margin-top: 0; margin-bottom: 1rem; font-family: var(--font-display); font-weight: 800; font-size: 1.3rem; color: var(--text-primary);">Positions Overview</h2>
+                    <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; margin-top: 0;">
+                        ${gridHTML}
+                    </div>
+                </div>
+            </div>
+        `;
         mainContent.innerHTML = html;
     }
+
+    window.selectInspectedPosition = function(posName) {
+        inspectedPosition = posName;
+        renderDashboard();
+    };
 
     // --- Student Vote Positions Listing ---
     function renderStudentVotePositions() {
@@ -274,6 +412,53 @@ document.addEventListener('DOMContentLoaded', () => {
         mainContent.innerHTML = html;
     }
 
+    function getCandidateImageSources(candidate) {
+        if (!candidate || !candidate.Name || !candidate.Position || !candidate.Grade) {
+            return ['placeholder.png'];
+        }
+        
+        const sources = [];
+        const nameParts = candidate.Name.split(' ').map(p => p.trim()).filter(p => p.length > 0);
+        const position = candidate.Position.trim();
+        const grade = candidate.Grade.trim();
+        const extensions = ['jpeg', 'jpg', 'png'];
+
+        // 1. Try name parts
+        nameParts.forEach(part => {
+            extensions.forEach(ext => {
+                sources.push(`Images/${position}/${part} - ${position} - ${grade}.${ext}`);
+            });
+        });
+
+        // 2. Try full name
+        extensions.forEach(ext => {
+            sources.push(`Images/${position}/${candidate.Name.trim()} - ${position} - ${grade}.${ext}`);
+        });
+
+        // 3. Fallback to placeholder
+        sources.push('placeholder.png');
+        
+        return sources;
+    }
+
+    window.handleImageError = function(img) {
+        try {
+            const sources = JSON.parse(img.getAttribute('data-sources'));
+            let index = parseInt(img.getAttribute('data-source-index') || '0', 10);
+            index++;
+            if (sources && index < sources.length) {
+                img.setAttribute('data-source-index', index);
+                img.src = sources[index];
+            } else {
+                img.src = 'placeholder.png';
+                img.onerror = null;
+            }
+        } catch (e) {
+            img.src = 'placeholder.png';
+            img.onerror = null;
+        }
+    };
+
     // --- Candidate Voting Page ---
     window.renderPosition = function(positionName, isStaff) {
         currentView = 'position';
@@ -313,10 +498,16 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             html += `<div class="candidates-grid">`;
             candidates.forEach(candidate => {
+                const sources = getCandidateImageSources(candidate);
                 html += `
                     <div class="candidate-card">
                         <div class="candidate-img-wrapper">
-                            <img src="placeholder.png" alt="${candidate.Name}" class="candidate-img">
+                            <img src="${sources[0]}" 
+                                 data-sources='${JSON.stringify(sources)}' 
+                                 data-source-index="0" 
+                                 onerror="window.handleImageError(this)" 
+                                 alt="${candidate.Name}" 
+                                 class="candidate-img">
                         </div>
                         <div class="candidate-info">
                             <h3 class="candidate-name">${candidate.Name}</h3>
