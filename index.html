@@ -38,24 +38,88 @@
         </div>
     </div>
 
-    <!-- Confirm Vote Modal (Hidden by default) -->
+    <!-- Confirm Voste Modal (Hidden by default) -->
     <div id="confirm-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 480px; padding: 2.5rem 2rem; box-shadow: var(--shadow-lg);">
-            <h2 style="font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; margin-bottom: 1.25rem; color: var(--text-primary);">Confirm Your Vote</h2>
+            <h2
+                style="font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; margin-bottom: 1.25rem; color: var(--text-primary);">
+                Confirm Your Vote</h2>
             <p style="color: var(--text-secondary); font-size: 1.05rem; line-height: 1.6; margin-bottom: 2rem;">
-                Are you sure you want to cast your vote for <strong id="confirm-candidate-name" style="color: var(--accent-primary); font-weight: 700;">[Candidate Name]</strong> for the role of <strong id="confirm-position-name" style="color: var(--text-primary); font-weight: 700;">[Position]</strong>?
+                Are you sure you want to cast your vote for <strong id="confirm-candidate-name"
+                    style="color: var(--accent-primary); font-weight: 700;">[Candidate Name]</strong> for the role of
+                <strong id="confirm-position-name"
+                    style="color: var(--text-primary); font-weight: 700;">[Position]</strong>?
             </p>
             <div style="display: flex; gap: 1rem; justify-content: center;">
-                <button id="confirm-cancel-btn" class="nav-btn" style="border: 1px solid var(--border-color); width: 120px; font-weight: 600; border-radius: 12px; padding: 0.75rem;">Cancel</button>
-                <button id="confirm-ok-btn" class="vote-btn" style="margin-top: 0; width: 160px; border-radius: 12px; padding: 0.75rem;">Confirm Vote</button>
+                <button id="confirm-cancel-btn" class="nav-btn"
+                    style="border: 1px solid var(--border-color); width: 120px; font-weight: 600; border-radius: 12px; padding: 0.75rem;">Cancel</button>
+                <button id="confirm-ok-btn" class="vote-btn"
+                    style="margin-top: 0; width: 160px; border-radius: 12px; padding: 0.75rem;">Confirm Vote</button>
             </div>
         </div>
     </div>
 
-    <div id="app">
+    <!-- Confirm Reset Modal (Hidden by default) -->
+    <div id="reset-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 480px; padding: 2.5rem 2rem; box-shadow: var(--shadow-lg);">
+            <h2
+                style="font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; margin-bottom: 1.25rem; color: #dc2626;">
+                ⚠️ Reset Database?</h2>
+            <p style="color: var(--text-secondary); font-size: 1.05rem; line-height: 1.6; margin-bottom: 2rem;">
+                Are you absolutely sure you want to reset the database? This action will set <strong>all votes to zero (0)</strong> and update Firebase. This cannot be undone.
+            </p>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button id="reset-cancel-btn" class="nav-btn"
+                    style="border: 1px solid var(--border-color); width: 120px; font-weight: 600; border-radius: 12px; padding: 0.75rem;">Cancel</button>
+                <button id="reset-confirm-btn" class="vote-btn"
+                    style="margin-top: 0; width: 160px; border-radius: 12px; padding: 0.75rem; background: linear-gradient(to right, #dc2626, #991b1b); box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.2);">Confirm Reset</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Login Modal (Shown if not authenticated) -->
+    <div id="login-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 400px; padding: 2.5rem 2rem; box-shadow: var(--shadow-lg);">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <img src="logo.png" alt="VIP's International School Logo" style="height: 80px; margin-bottom: 1rem; object-fit: contain;">
+                <h2 style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em;">
+                    Voter Portal Login
+                </h2>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 0.5rem;">
+                    Please enter credentials to unlock the voting system.
+                </p>
+            </div>
+            
+            <form id="login-form" onsubmit="window.handleLogin(event)" style="display: flex; flex-direction: column; gap: 1.25rem; text-align: left;">
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <label for="login-id" style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; font-family: var(--font-sans);">Voter Portal ID</label>
+                    <input type="text" id="login-id" required placeholder="Enter ID" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: 12px; font-family: var(--font-sans); font-size: 0.95rem; outline: none; transition: border-color 0.2s;">
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <label for="login-password" style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; font-family: var(--font-sans);">Password</label>
+                    <input type="password" id="login-password" required placeholder="Enter Password" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: 12px; font-family: var(--font-sans); font-size: 0.95rem; outline: none; transition: border-color 0.2s;">
+                </div>
+                
+                <div id="login-error" style="color: #dc2626; font-size: 0.85rem; font-weight: 600; display: none; text-align: center; margin-top: 0.25rem;">
+                    ❌ Invalid ID or Password.
+                </div>
+                
+                <button type="submit" class="vote-btn" style="margin-top: 0.5rem; padding: 0.75rem; border-radius: 12px; font-size: 1rem; font-weight: 600;">
+                    Authenticate
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="app" style="display: none;">
+
         <header class="navbar">
             <div class="logo">
-                <img src="logo.png" alt="VIP's International School Logo" class="logo-img" onclick="window.renderHomeView()" style="height: 90px; margin: -20px 0; cursor: pointer; transition: transform 0.2s ease;">
+                <img src="logo.png" alt="VIP's International School Logo" class="logo-img"
+                    onclick="window.renderHomeView()"
+                    style="height: 90px; margin: -20px 0; cursor: pointer; transition: transform 0.2s ease;">
             </div>
             <nav style="display: flex; gap: 1.5rem; align-items: center;">
                 <button id="nav-dashboard" class="nav-btn active">Dashboard</button>

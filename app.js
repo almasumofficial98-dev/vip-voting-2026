@@ -10,6 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Core Application ---
     function init() {
+        if (localStorage.getItem("vip_authenticated") !== "true") {
+            document.getElementById('login-modal').style.display = 'flex';
+            return;
+        }
+
+        document.getElementById('app').style.display = 'flex';
         renderLoader();
         
         // Subscribe to real-time updates immediately
@@ -47,6 +53,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="stats-counter">
                     <span class="stats-num">${totalVotes}</span>
                     <span class="stats-label">Total Votes Cast</span>
+                </div>
+                <div style="margin-top: 1.5rem;">
+                    <button class="reset-db-btn" onclick="window.handleResetDatabase()">
+                        <svg style="vertical-align: middle; margin-right: 0.5rem;" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Reset Database
+                    </button>
                 </div>
             </div>
             
@@ -224,6 +238,57 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     };
+
+    window.handleResetDatabase = function() {
+        const resetModal = document.getElementById('reset-modal');
+        const resetConfirmBtn = document.getElementById('reset-confirm-btn');
+        const resetCancelBtn = document.getElementById('reset-cancel-btn');
+
+        resetModal.style.display = 'flex';
+
+        const newConfirmBtn = resetConfirmBtn.cloneNode(true);
+        resetConfirmBtn.parentNode.replaceChild(newConfirmBtn, resetConfirmBtn);
+
+        const newCancelBtn = resetCancelBtn.cloneNode(true);
+        resetCancelBtn.parentNode.replaceChild(newCancelBtn, resetCancelBtn);
+
+        newCancelBtn.addEventListener('click', () => {
+            resetModal.style.display = 'none';
+        });
+
+        newConfirmBtn.addEventListener('click', async () => {
+            resetModal.style.display = 'none';
+            renderLoader();
+            const success = await resetAllVotes();
+            if (success) {
+                renderDashboard();
+            } else {
+                renderDashboard();
+            }
+        });
+    };
+
+    window.handleLogin = function(event) {
+        event.preventDefault();
+        const idInput = document.getElementById('login-id');
+        const passInput = document.getElementById('login-password');
+        const errorMsg = document.getElementById('login-error');
+
+        const id = idInput.value.trim();
+        const password = passInput.value;
+
+        if (id === 'ashken' && password === 'kenash') {
+            localStorage.setItem("vip_authenticated", "true");
+            document.getElementById('login-modal').style.display = 'none';
+            init();
+        } else {
+            errorMsg.style.display = 'block';
+            passInput.value = '';
+            passInput.focus();
+        }
+    };
+
+
 
     // Navigation triggers
     dashboardBtn.addEventListener('click', renderDashboard);

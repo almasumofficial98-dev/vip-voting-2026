@@ -487,3 +487,42 @@ footer {
     border-radius: 99px;
     transition: width 1.2s cubic-bezier(0.1, 0.8, 0.2, 1);
 }
+
+.reset-db-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    color: #dc2626;
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.5rem 1.25rem;
+    border-radius: 99px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-top: 1rem;
+}
+
+.reset-db-btn:hover {
+    color: white;
+    background: #dc2626;
+    border-color: #dc2626;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+}
+
+.reset-db-btn:active {
+    transform: scale(0.95);
+}
+
+#login-form input {
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#login-form input:focus {
+    border-color: var(--accent-primary) !important;
+    box-shadow: 0 0 0 3px rgba(168, 35, 41, 0.1);
+}
+
+

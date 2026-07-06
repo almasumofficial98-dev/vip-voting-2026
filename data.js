@@ -165,3 +165,33 @@ window.adminPopulateFirebase = async function() {
     }
     console.log(`Successfully uploaded ${count} candidates to Firebase!`);
 }
+
+// 4. Reset all votes to 0 in Firebase
+async function resetAllVotes() {
+    if (firebaseConfig.apiKey === "YOUR_API_KEY") {
+        console.log("Firebase not configured yet. Simulated resetting mock data.");
+        return true;
+    }
+
+    try {
+        const snapshot = await db.collection('candidates').get();
+        if (snapshot.empty) {
+            console.log("No candidates to reset.");
+            return true;
+        }
+
+        const batch = db.batch();
+        snapshot.forEach(doc => {
+            batch.update(doc.ref, { voteCount: 0 });
+        });
+
+        await batch.commit();
+        console.log("All votes successfully reset in Firebase!");
+        return true;
+    } catch (error) {
+        console.error("Error resetting votes in Firebase:", error);
+        alert("Failed to reset database: " + error.message);
+        return false;
+    }
+}
+
