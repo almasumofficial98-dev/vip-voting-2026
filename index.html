@@ -113,7 +113,43 @@
         </div>
     </div>
 
+    <!-- Admin/Staff Login Modal (Shown when accessing Staff Voting or Dashboard) -->
+    <div id="admin-login-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 400px; padding: 2.5rem 2rem; box-shadow: var(--shadow-lg);">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h2 style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em;">
+                    🔒 Admin Verification
+                </h2>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 0.5rem;">
+                    Staff Voting and Dashboard require elevated permissions.
+                </p>
+            </div>
+            
+            <form id="admin-login-form" onsubmit="window.handleAdminLogin(event)" style="display: flex; flex-direction: column; gap: 1.25rem; text-align: left;">
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <label for="admin-login-id" style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; font-family: var(--font-sans);">Admin ID</label>
+                    <input type="text" id="admin-login-id" required placeholder="Enter Admin ID" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: 12px; font-family: var(--font-sans); font-size: 0.95rem; outline: none; transition: border-color 0.2s;">
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <label for="admin-login-password" style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; font-family: var(--font-sans);">Password</label>
+                    <input type="password" id="admin-login-password" required placeholder="Enter Password" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: 12px; font-family: var(--font-sans); font-size: 0.95rem; outline: none; transition: border-color 0.2s;">
+                </div>
+                
+                <div id="admin-login-error" style="color: #dc2626; font-size: 0.85rem; font-weight: 600; display: none; text-align: center; margin-top: 0.25rem;">
+                    ❌ Invalid Admin credentials.
+                </div>
+                
+                <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 0.5rem;">
+                    <button type="button" class="nav-btn" onclick="window.cancelAdminLogin()" style="border: 1px solid var(--border-color); width: 120px; font-weight: 600; border-radius: 12px; padding: 0.75rem;">Cancel</button>
+                    <button type="submit" class="vote-btn" style="margin-top: 0; width: 160px; border-radius: 12px; padding: 0.75rem; font-weight: 600;">Verify</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div id="app" style="display: none;">
+
 
         <header class="navbar">
             <div class="logo">
@@ -123,7 +159,9 @@
             </div>
             <nav style="display: flex; gap: 1rem; align-items: center;">
                 <button id="nav-dashboard" class="nav-btn">Dashboard</button>
-                <button id="nav-vote" class="nav-btn active">Vote</button>
+                <button id="nav-student-vote" class="nav-btn active">Student Voting</button>
+                <button id="nav-staff-vote" class="nav-btn">Staff Voting</button>
+                <button id="nav-logout" class="nav-btn logout-btn">Logout</button>
             </nav>
         </header>
 

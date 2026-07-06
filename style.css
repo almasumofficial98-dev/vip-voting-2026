@@ -516,13 +516,28 @@ footer {
     transform: scale(0.95);
 }
 
-#login-form input {
+#login-form input, #admin-login-form input {
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-#login-form input:focus {
+#login-form input:focus, #admin-login-form input:focus {
     border-color: var(--accent-primary) !important;
     box-shadow: 0 0 0 3px rgba(168, 35, 41, 0.1);
 }
+
+.logout-btn {
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+    color: #dc2626 !important;
+    background: rgba(220, 38, 38, 0.05) !important;
+    border-color: rgba(220, 38, 38, 0.2) !important;
+}
+
+
 
 

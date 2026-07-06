@@ -72,11 +72,10 @@ const MOCK_DATA = [
     { Position: "Eco Club Captain", Name: "Ayra Hidayat", Grade: "9A" },
     { Position: "Eco Club Captain", Name: "Yusra fathima", Grade: "9A" },
     
-    { Position: "Eco Club Vice Captain", Name: "Sayyedah Afnaan Fatima", Grade: "8A" },
-    { Position: "Eco Club Vice Captain", Name: "Afiya Abdul Matheen", Grade: "8A" },
-    { Position: "Eco Club Vice Captain", Name: "Khadija Khaja Moinuddin", Grade: "8A" },
-    { Position: "Eco Club Vice Captain", Name: "Daniya Khamar", Grade: "8A" }
+    { Position: "Eco Club Vice Captain", Name: "Khadija Khaja Moinuddin", Grade: "8A" }
 ];
+
+
 
 // ==========================================
 // FIREBASE DATA FUNCTIONS
@@ -126,17 +125,17 @@ function subscribeToCandidates(callback) {
     });
 }
 
-// 3. Cast a vote (No authentication required, directly increments the count)
-async function castVote(candidateId) {
+// 3. Cast a vote with a specific weight (default is 1 for students, higher for staff roles)
+async function castVote(candidateId, weight = 1) {
     if (firebaseConfig.apiKey === "YOUR_API_KEY") {
-        alert("Firebase is not configured yet. This is just a test.");
+        alert(`Firebase is not configured yet. Simulated casting a vote with weight ${weight}.`);
         return true; 
     }
 
     try {
         const candidateRef = db.collection('candidates').doc(candidateId);
         await candidateRef.update({
-            voteCount: firebase.firestore.FieldValue.increment(1)
+            voteCount: firebase.firestore.FieldValue.increment(weight)
         });
         return true;
     } catch (error) {
@@ -146,7 +145,7 @@ async function castVote(candidateId) {
     }
 }
 
-// 3. Admin Helper: Run this ONCE in the browser console to push all MOCK_DATA to Firebase
+// 4. Admin Helper: Run this ONCE in the browser console to push all MOCK_DATA to Firebase
 window.adminPopulateFirebase = async function() {
     if (firebaseConfig.apiKey === "YOUR_API_KEY") {
         alert("Configure Firebase first!");
@@ -166,7 +165,7 @@ window.adminPopulateFirebase = async function() {
     console.log(`Successfully uploaded ${count} candidates to Firebase!`);
 }
 
-// 4. Reset all votes to 0 in Firebase
+// 5. Reset all votes to 0 in Firebase
 async function resetAllVotes() {
     if (firebaseConfig.apiKey === "YOUR_API_KEY") {
         console.log("Firebase not configured yet. Simulated resetting mock data.");
@@ -186,7 +185,7 @@ async function resetAllVotes() {
         });
 
         await batch.commit();
-        console.log("All votes successfully reset in Firebase!");
+        console.log("All student candidate votes successfully reset in Firebase!");
         return true;
     } catch (error) {
         console.error("Error resetting votes in Firebase:", error);
@@ -194,4 +193,6 @@ async function resetAllVotes() {
         return false;
     }
 }
+
+
 
