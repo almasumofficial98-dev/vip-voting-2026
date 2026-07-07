@@ -39,7 +39,7 @@ const MOCK_DATA = [
     { Position: "Champions Vice captain", Name: "Mohammed Affan", Grade: "8C" },
     { Position: "Champions Vice captain", Name: "Abdul Hadi", Grade: "8B" },
     
-    { Position: "Superior Captain", Name: "Aira fatima", Grade: "9A" },
+    { Position: "Superior Captain", Name: "Airxa fatima", Grade: "9A" },
     { Position: "Superior Captain", Name: "Sheema Fatima", Grade: "9A" },
     
     { Position: "Superior Vice Captain", Name: "Rida Fatima", Grade: "8A" },
@@ -71,7 +71,7 @@ const MOCK_DATA = [
     { Position: "Eco Club Captain", Name: "Sumaira Maheen", Grade: "9A" },
     { Position: "Eco Club Captain", Name: "Ayra Hidayat", Grade: "9A" },
     { Position: "Eco Club Captain", Name: "Yusra fathima", Grade: "9A" },
-    
+
     { Position: "Eco Club Vice Captain", Name: "Khadija Khaja Moinuddin", Grade: "8A" }
 ];
 
