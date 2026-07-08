@@ -421,7 +421,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const nameParts = candidate.Name.split(' ').map(p => p.trim()).filter(p => p.length > 0);
         const position = candidate.Position.trim();
         const grade = candidate.Grade.trim();
-        const extensions = ['jpeg', 'jpg', 'png'];
+        const extensions = ['jpeg', 'jpg', 'png', 'JPG'];
 
         // 1. Try name parts
         nameParts.forEach(part => {
